@@ -88,7 +88,7 @@ module.exports = (robot) ->
       allStatuses = normalizeStatuses(data)
       statusesByType = _.groupBy(allStatuses, 'links.status_type')
       finalMessages = _.map statusesByType, (statuses) ->
-        messages = ["\n## #{statuses[0].statusType.name}\n"]
+        messages = ["\n**#{statuses[0].statusType.name}**\n"]
         statusMessages = statuses.map (status) ->
           name = _.compact([status.user.first_name, status.user.last_name])
             .join(' ')
