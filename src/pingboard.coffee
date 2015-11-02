@@ -2,17 +2,11 @@
 #   A hubot script for interacting with Pingboard.com
 #
 # Configuration:
-#   # TODO REMOVE BASED ON WHICH WE USE
 #   HUBOT_PINGBOARD_USERNAME
 #   HUBOT_PINGBOARD_PASSWORD
 #
-#   HUBOT_PINGBOARD_ACCESS_TOKEN
-#   HUBOT_PINGBOARD_REFRESH_TOKEN
-#
 # Commands:
-#   hubot who's in - Lists who's not working today.
 #   hubot who's out - Lists who's working today.
-#   hubot upcoming birthdays
 #
 # Notes:
 #   Requires HUBOT_PINGBOARD_PASSWORD to be set.
