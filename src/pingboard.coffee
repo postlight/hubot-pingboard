@@ -21,7 +21,7 @@ _ = require 'lodash'
 BASE_APP_URL = 'https://app.pingboard.com'
 AUTH_URL = [BASE_APP_URL, 'oauth/token'].join('/')
 STATUSES_URL = [BASE_APP_URL, 'api/v2/statuses'].join('/')
-
+MULTI_DAY_FORMAT = 'ddd M/D'
 
 module.exports = (robot) ->
   fetchAccessToken = ->
@@ -86,11 +86,20 @@ module.exports = (robot) ->
         statusMessages = statuses.map (status) ->
           name = _.compact([status.user.first_name, status.user.last_name])
             .join(' ')
-          time = if status.all_day
+          startsMoment = moment(status.starts_at)
+          endsMoment = moment(status.ends_at)
+          isMultiDay =
+            status.all_day and !startsMoment.isSame(endsMoment, 'day')
+          time = if isMultiDay
+            [
+              startsMoment.format(MULTI_DAY_FORMAT),
+              endsMoment.format(MULTI_DAY_FORMAT)
+            ].join(' - ')
+          else if status.all_day
             'all day'
           else if status.time_period == 'another_time'
-            start = moment(status.starts_at).format('h:mma')
-            end = moment(status.ends_at).format('h:mma')
+            start = startsMoment.format('h:mma')
+            end = endsMoment.format('h:mma')
             "#{start} - #{end}"
           else
             status.time_period.replace('_', ' ')
