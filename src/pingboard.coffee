@@ -123,7 +123,7 @@ module.exports = (robot) ->
   robot.router.post '/hubot/pingboard-update', (req, res) ->
     fetchAndNormalizeStatuses().then((message) ->
       now = moment()
-      title = "Statuses for #{now.format('MMMM Mo, YYYY')}"
+      title = "Statuses for #{now.format('MMMM do, YYYY')}"
       htmlMessage = marked(message)
       flowToken = process.env.HUBOT_PINGBOARD_FLOWDOCK_FLOW_TOKEN
       if !flowToken
