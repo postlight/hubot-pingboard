@@ -15,7 +15,7 @@
 #   Jeremy Mack <jeremy.mack@postlight.com>
 
 Promise = require 'bluebird'
-moment = require 'moment-timezone'
+moment = require 'moment'
 _ = require 'lodash'
 marked = require 'marked'
 
@@ -23,8 +23,6 @@ BASE_APP_URL = 'https://app.pingboard.com'
 AUTH_URL = [BASE_APP_URL, 'oauth/token'].join('/')
 STATUSES_URL = [BASE_APP_URL, 'api/v2/statuses'].join('/')
 MULTI_DAY_FORMAT = 'ddd M/D'
-
-moment.tz.setDefault(process.env.TZ) if process.env.TZ
 
 module.exports = (robot) ->
   fetchAccessToken = ->
@@ -125,7 +123,7 @@ module.exports = (robot) ->
   robot.router.post '/hubot/pingboard-update', (req, res) ->
     fetchAndNormalizeStatuses().then((message) ->
       now = moment()
-      title = "Statuses for #{now.format('MMMM do, YYYY')}"
+      title = "Statuses for #{now.format('MMMM Do, YYYY')}"
       htmlMessage = marked(message)
       flowToken = process.env.HUBOT_PINGBOARD_FLOWDOCK_FLOW_TOKEN
       if !flowToken
