@@ -40,3 +40,19 @@ describe 'pingboard', ->
         resolve()
       , ASYNC_WAIT)
 
+  it "responds to 'list projects?'", ->
+    new Promise (resolve, reject) =>
+      @room.user.say 'alice', "@hubot list projects"
+      setTimeout(=>
+        expect(@room.messages).to.deep.equal([
+          [
+            'alice'
+            '@hubot list projects'
+          ],
+          [
+            'hubot'
+            'Project 1, Project 2'
+          ]
+        ])
+        resolve()
+      , ASYNC_WAIT)

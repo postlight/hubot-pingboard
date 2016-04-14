@@ -19,9 +19,10 @@ moment = require 'moment'
 _ = require 'lodash'
 marked = require 'marked'
 
-BASE_APP_URL = 'https://app.pingboard.com'
-AUTH_URL = [BASE_APP_URL, 'oauth/token'].join('/')
-STATUSES_URL = [BASE_APP_URL, 'api/v2/statuses'].join('/')
+PINGBOARD_BASE_URL = 'https://app.pingboard.com'
+AUTH_URL = "#{PINGBOARD_BASE_URL}/oauth/token"
+STATUSES_ENDPOINT = 'api/v2/statuses'
+GROUPS_ENDPOINT = 'api/v2/groups'
 MULTI_DAY_FORMAT = 'ddd M/D'
 
 module.exports = (robot) ->
@@ -46,26 +47,42 @@ module.exports = (robot) ->
 
           resolve(json.access_token)
 
-  fetchStatuses = (accessToken) ->
+  fetchPingboardEndpoint = ({ endpoint, params }) ->
     new Promise (resolve, reject) ->
-      robot.http(STATUSES_URL)
+      robot.http("#{PINGBOARD_BASE_URL}/#{endpoint}")
         .header('Content-Type', 'application/json')
-        .query(
-          access_token:  accessToken
-          include:       'user,status_type'
-          page_size:     '2000'
-          starts_at:     moment().format('YYYY-MM-DD')
-          ends_at:       moment().format('YYYY-MM-DD')
-        )
+        .query(params)
         .get() (error, res, body) ->
           return reject("Encountered an error :( #{error}") if error
 
           try
             json = JSON.parse(body)
           catch error
-            return new Error('Ran into an error parsing JSON for hubot-pingboard')
+            return new Error(
+              'Ran into an error parsing JSON for hubot-pingboard'
+            )
 
           resolve(json)
+
+  fetchStatuses = (accessToken) ->
+    fetchPingboardEndpoint(
+      endpoint: STATUSES_ENDPOINT
+      params:
+        access_token:  accessToken
+        include:       'user,status_type'
+        page_size:     '2000'
+        starts_at:     moment().format('YYYY-MM-DD')
+        ends_at:       moment().format('YYYY-MM-DD')
+    )
+
+  fetchGroups = (accessToken) ->
+    fetchPingboardEndpoint(
+      endpoint: GROUPS_ENDPOINT
+      params:
+        access_token:  accessToken
+        include:       'user'
+        page_size:     '2000'
+    )
 
   normalizeStatuses = (data) ->
     { statuses } = data
@@ -82,6 +99,13 @@ module.exports = (robot) ->
     ).then((data) ->
       allStatuses = normalizeStatuses(data)
       formatStatusMessage(allStatuses)
+    )
+
+  authenticateAndFetchGroups = ->
+    fetchAccessToken().then((accessToken) ->
+      fetchGroups(accessToken)
+    ).then((data) ->
+      data.groups
     )
 
   formatStatusMessage = (allStatuses) ->
@@ -166,6 +190,16 @@ module.exports = (robot) ->
   robot.respond /who.s out??/, (msg) ->
     fetchAndNormalizeStatuses().then((message) ->
       msg.send(message)
+    ).catch((error) ->
+      console.log('hubot-pingboard error', error)
+      msg.send("Error in hubot-pingboard #{error}")
+    )
+
+  robot.respond /(list projects|what projects do we have??)/, (msg) ->
+    authenticateAndFetchGroups().then((groups) ->
+      groupNames = groups.map((group) -> group.name)
+      sortedGroups = _.sortBy(groups, 'name')
+      msg.send(_.map(sortedGroups, 'name').join(', '))
     ).catch((error) ->
       console.log('hubot-pingboard error', error)
       msg.send("Error in hubot-pingboard #{error}")
