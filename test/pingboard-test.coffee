@@ -52,7 +52,9 @@ describe 'pingboard', ->
           ],
           [
             'hubot'
+            # coffeelint: disable=max_line_length
             '[Project 1](https://test.pingboard.com/group/1), [Project 2](https://test.pingboard.com/group/1)'
+            # coffeelint: enable=max_line_length
           ]
         ])
         resolve()
