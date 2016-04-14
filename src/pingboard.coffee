@@ -218,7 +218,13 @@ module.exports = (robot) ->
     authenticateAndFetchGroups().then((groups) ->
       groupNames = groups.map((group) -> group.name)
       sortedGroups = _.sortBy(groups, 'name')
-      msg.send(_.map(sortedGroups, 'name').join(', '))
+      groupsText = sortedGroups.map((group) ->
+        markdownLink(
+          group.name, pingboardUrl("group/#{group.id}")
+        )
+      ).join(', ')
+
+      msg.send(groupsText)
     ).catch((error) ->
       console.log('hubot-pingboard error', error)
       msg.send("Error in hubot-pingboard #{error}")

@@ -52,7 +52,7 @@ describe 'pingboard', ->
           ],
           [
             'hubot'
-            'Project 1, Project 2'
+            '[Project 1](https://test.pingboard.com/group/1), [Project 2](https://test.pingboard.com/group/1)'
           ]
         ])
         resolve()
