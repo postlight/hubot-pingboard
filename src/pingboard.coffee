@@ -224,7 +224,7 @@ module.exports = (robot) ->
       sortedGroups = _.sortBy(groups, 'name')
       groupsText = sortedGroups.map((group) ->
         '- ' + markdownLink(
-          group.name, pingboardUrl("group/#{group.id}")
+          group.name, pingboardUrl("groups/#{group.id}")
         )
       ).join('\n')
 
@@ -252,7 +252,7 @@ module.exports = (robot) ->
 
       msg.send([
         markdownLink(
-          matchingGroup.name, pingboardUrl("group/#{matchingGroup.id}")
+          matchingGroup.name, pingboardUrl("groups/#{matchingGroup.id}")
         )
         ": "
         usersText
