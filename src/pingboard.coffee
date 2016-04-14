@@ -234,7 +234,7 @@ module.exports = (robot) ->
       msg.send("Error in hubot-pingboard #{error}")
     )
 
-  robot.respond /who(?:'?s| is) on (.+)(?:\?)/, (msg) ->
+  robot.respond /who(?:.s| is) on (.+)(?:\?)/, (msg) ->
     msg.send('Checking...')
     projectName = msg.match[1]
     authenticateAndFetchGroups().then((groups) ->
