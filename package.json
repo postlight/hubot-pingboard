@@ -35,10 +35,11 @@
     "mocha": "^2.1.0",
     "replay": "2.0.6",
     "sinon": "^1.13.0",
-    "sinon-chai": "^2.7.0"
+    "sinon-chai": "^2.7.0",
+    "string_score": "0.1.22"
   },
   "main": "index.coffee",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test || true"
   }
 }

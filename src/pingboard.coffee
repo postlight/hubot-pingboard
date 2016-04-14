@@ -4,12 +4,10 @@
 # Configuration:
 #   HUBOT_PINGBOARD_USERNAME
 #   HUBOT_PINGBOARD_PASSWORD
+#   HUBOT_PINGBOARD_SUBDOMAIN
 #
 # Commands:
 #   hubot who's out - Lists who's working today.
-#
-# Notes:
-#   Requires HUBOT_PINGBOARD_PASSWORD to be set.
 #
 # Author:
 #   Jeremy Mack <jeremy.mack@postlight.com>
@@ -18,12 +16,15 @@ Promise = require 'bluebird'
 moment = require 'moment'
 _ = require 'lodash'
 marked = require 'marked'
+# add score method to string.
+require 'string_score'
 
 PINGBOARD_BASE_URL = 'https://app.pingboard.com'
 AUTH_URL = "#{PINGBOARD_BASE_URL}/oauth/token"
 STATUSES_ENDPOINT = 'api/v2/statuses'
 GROUPS_ENDPOINT = 'api/v2/groups'
 MULTI_DAY_FORMAT = 'ddd M/D'
+SUBDOMAIN = process.env.HUBOT_PINGBOARD_SUBDOMAIN
 
 module.exports = (robot) ->
   fetchAccessToken = ->
@@ -84,6 +85,15 @@ module.exports = (robot) ->
         page_size:     '2000'
     )
 
+  nameForUser = (user) ->
+    _.compact([user.first_name, user.last_name]).join(' ')
+
+  pingboardUrl = (path) ->
+    "https://#{SUBDOMAIN}.pingboard.com/#{path}"
+
+  markdownLink = (text, url) ->
+    "[#{text}](#{url})"
+
   normalizeStatuses = (data) ->
     { statuses } = data
     users = data.linked.users
@@ -92,6 +102,14 @@ module.exports = (robot) ->
       status.user = _.find(users, id: status.links.user)
       status.statusType = _.find(statusTypes, id: status.links.status_type)
       status
+
+  normalizeGroups = (data) ->
+    { groups } = data
+    users = data.linked.users
+    groups.map (group) ->
+      group.users = group.links.users.map (userId) ->
+        _.find(users, id: userId)
+      group
 
   fetchAndNormalizeStatuses = ->
     fetchAccessToken().then((accessToken) ->
@@ -105,7 +123,7 @@ module.exports = (robot) ->
     fetchAccessToken().then((accessToken) ->
       fetchGroups(accessToken)
     ).then((data) ->
-      data.groups
+      normalizeGroups(data)
     )
 
   formatStatusMessage = (allStatuses) ->
@@ -113,8 +131,7 @@ module.exports = (robot) ->
     finalMessages = _.map statusesByType, (statuses) ->
       messages = ["\n**#{statuses[0].statusType.name}**\n"]
       statusMessages = statuses.map (status) ->
-        name = _.compact([status.user.first_name, status.user.last_name])
-          .join(' ')
+        name = nameForUser(status.user)
         startsMoment = moment(status.starts_at)
         endsMoment = moment(status.ends_at)
         isMultiDay =
@@ -187,7 +204,7 @@ module.exports = (robot) ->
       res.send 'FAILED'
     )
 
-  robot.respond /who.s out??/, (msg) ->
+  robot.respond /who.s out(?:\?)/, (msg) ->
     fetchAndNormalizeStatuses().then((message) ->
       msg.send(message)
     ).catch((error) ->
@@ -195,11 +212,37 @@ module.exports = (robot) ->
       msg.send("Error in hubot-pingboard #{error}")
     )
 
-  robot.respond /(list projects|what projects do we have??)/, (msg) ->
+  robot.respond /(list projects|what projects do we have(?:\?))/, (msg) ->
     authenticateAndFetchGroups().then((groups) ->
       groupNames = groups.map((group) -> group.name)
       sortedGroups = _.sortBy(groups, 'name')
       msg.send(_.map(sortedGroups, 'name').join(', '))
+    ).catch((error) ->
+      console.log('hubot-pingboard error', error)
+      msg.send("Error in hubot-pingboard #{error}")
+    )
+
+  robot.respond /who(?:'?s| is) on (.+)(?:\?)/, (msg) ->
+    projectName = msg.match[1]
+    authenticateAndFetchGroups().then((groups) ->
+      matchingGroup = _.max(groups, (group) ->
+        group.name.score(projectName)
+      )
+      usersText = _.chain(matchingGroup.users)
+        .compact()
+        .map((user) ->
+          markdownLink(nameForUser(user), pingboardUrl("users/#{user.id}"))
+        )
+        .value()
+        .join(', ')
+
+      msg.send([
+        markdownLink(
+          matchingGroup.name, pingboardUrl("/group/#{matchingGroup.id}")
+        )
+        ": "
+        usersText
+      ].join(''))
     ).catch((error) ->
       console.log('hubot-pingboard error', error)
       msg.send("Error in hubot-pingboard #{error}")
