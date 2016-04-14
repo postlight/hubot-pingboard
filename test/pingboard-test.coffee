@@ -70,7 +70,7 @@ describe 'pingboard', ->
           [
             'hubot'
             # coffeelint: disable=max_line_length
-            '[Project 2](https://test.pingboard.com//group/1): [Test Person](https://test.pingboard.com/users/1), [Test Person 2](https://test.pingboard.com/users/2), [Test Person 3](https://test.pingboard.com/users/3)'
+            '[Project 2](https://test.pingboard.com/group/1): [Test Person](https://test.pingboard.com/users/1), [Test Person 2](https://test.pingboard.com/users/2), [Test Person 3](https://test.pingboard.com/users/3)'
             # coffeelint: enable=max_line_length
           ]
         ])
@@ -89,7 +89,7 @@ describe 'pingboard', ->
           [
             'hubot'
             # coffeelint: disable=max_line_length
-            '[Project 1](https://test.pingboard.com//group/1): [Test Person 3](https://test.pingboard.com/users/3)'
+            '[Project 1](https://test.pingboard.com/group/1): [Test Person 3](https://test.pingboard.com/users/3)'
             # coffeelint: enable=max_line_length
           ]
         ])

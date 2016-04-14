@@ -238,7 +238,7 @@ module.exports = (robot) ->
 
       msg.send([
         markdownLink(
-          matchingGroup.name, pingboardUrl("/group/#{matchingGroup.id}")
+          matchingGroup.name, pingboardUrl("group/#{matchingGroup.id}")
         )
         ": "
         usersText
