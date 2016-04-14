@@ -30,8 +30,10 @@
     "grunt-mocha-test": "~0.12.7",
     "grunt-release": "~0.11.0",
     "hubot": "2.x",
+    "hubot-test-helper": "^1.4.4",
     "matchdep": "~0.3.0",
     "mocha": "^2.1.0",
+    "replay": "2.0.6",
     "sinon": "^1.13.0",
     "sinon-chai": "^2.7.0"
   },

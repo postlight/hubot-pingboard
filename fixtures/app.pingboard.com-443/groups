@@ -1,0 +1,72 @@
+GET /api/v2/groups?access_token=token&include=user&page_size=2000
+content-type: application/json
+host: app.pingboard.com
+
+HTTP/1.1 200 OK
+server: Cowboy
+connection: close
+date: Thu, 14 Apr 2016 19:28:35 GMT
+status: 200 OK
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-pingboard-analytic-id: 106978
+etag: "db8643675afc99cc66a8d4e06a78ccd6"
+content-type: application/json; charset=utf-8
+cache-control: max-age=0, private, must-revalidate
+vary: Accept-Encoding
+x-request-id: 2cd9df31-47cd-4ec0-ad95-3b90e24963d2
+x-runtime: 0.289508
+strict-transport-security: max-age=31536000
+via: 1.1 vegur
+
+{
+  "groups": [
+    {
+      "id": "1",
+      "name": "Project 1",
+      "description": "",
+      "created_at": "2016-04-14T17:58:01Z",
+      "updated_at": "2016-04-14T17:58:01Z",
+      "memberships_count": 3,
+      "logo_urls": null,
+      "type": "group",
+      "custom_fields": { },
+      "visible_to_owner": true,
+      "visible_to_group": true,
+      "visible_to_other": false,
+      "editable_by_owner": false,
+      "links": { "users": ["1", "2", "3"] }
+    },
+    {
+      "id": "1",
+      "name": "Project 2",
+      "description": "",
+      "created_at": "2016-04-14T17:58:01Z",
+      "updated_at": "2016-04-14T17:58:01Z",
+      "memberships_count": 3,
+      "logo_urls": null,
+      "type": "group",
+      "custom_fields": { },
+      "visible_to_owner": true,
+      "visible_to_group": true,
+      "visible_to_other": false,
+      "editable_by_owner": false,
+      "links": { "users": ["1", "2", "3"] }
+    }
+  ],
+  "links": { "groups.users": { "href": "/api/v2/users?group_id={groups.id}", "type": "users" } },
+  "meta": {
+    "groups": {
+      "page": 1,
+      "page_size": 2000,
+      "count": 26,
+      "page_count": 1,
+      "first_href": "/api/v2/groups?page_size=2000",
+      "previous_href": null,
+      "next_href": null,
+      "last_href": "/api/v2/groups?page_size=2000",
+      "memberships_count": 90
+    }
+  }
+}

@@ -1,0 +1,23 @@
+POST /oauth/token?username=test&password=test&grant_type=password
+content-type: application/json
+host: app.pingboard.com
+
+HTTP/1.1 200 OK
+server: Cowboy
+connection: close
+date: Thu, 14 Apr 2016 19:28:34 GMT
+status: 200 OK
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+cache-control: no-store
+pragma: no-cache
+content-type: application/json; charset=utf-8
+vary: Accept-Encoding
+etag: W/"241e34906714bfef7b16a9bc030124eb"
+x-request-id: bdb23027-2303-4752-938e-ee877c0a302c
+x-runtime: 0.200090
+strict-transport-security: max-age=31536000
+via: 1.1 vegur
+
+{"access_token":"token","token_type":"bearer","expires_in":1904,"refresh_token":"refresh-token","scope":"public","created_at":1460656818}
