@@ -41,7 +41,7 @@ describe 'pingboard', ->
         resolve()
       , ASYNC_WAIT)
 
-  it "responds to 'list projects?'", ->
+  it "responds to 'list projects'", ->
     new Promise (resolve, reject) =>
       @room.user.say 'alice', "@hubot list projects"
       setTimeout(=>
@@ -52,8 +52,12 @@ describe 'pingboard', ->
           ],
           [
             'hubot'
+            'Checking...'
+          ],
+          [
+            'hubot'
             # coffeelint: disable=max_line_length
-            '[Project 1](https://test.pingboard.com/group/1), [Project 2](https://test.pingboard.com/group/1)'
+            '- [Project 1](https://test.pingboard.com/group/1)\n- [Project 2](https://test.pingboard.com/group/1)'
             # coffeelint: enable=max_line_length
           ]
         ])
@@ -68,6 +72,10 @@ describe 'pingboard', ->
           [
             'alice'
             "@hubot who's on 2?"
+          ],
+          [
+            'hubot'
+            'Checking...'
           ],
           [
             'hubot'
@@ -87,6 +95,10 @@ describe 'pingboard', ->
           [
             'alice'
             "@hubot who's on project 1?"
+          ],
+          [
+            'hubot'
+            'Checking...'
           ],
           [
             'hubot'

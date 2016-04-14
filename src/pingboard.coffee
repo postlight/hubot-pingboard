@@ -83,8 +83,10 @@ module.exports = (robot) ->
       endpoint: GROUPS_ENDPOINT
       params:
         access_token:  accessToken
-        include:       'user'
-        page_size:     '2000'
+        include:       'users'
+        type:          'group'
+        sort:          'name'
+        page_size:     '100'
     )
 
   nameForUser = (user) ->
@@ -107,10 +109,11 @@ module.exports = (robot) ->
 
   normalizeGroups = (data) ->
     { groups } = data
-    users = data.linked.users
+    allusers = data.linked.users
     groups.map (group) ->
-      group.users = group.links.users.map (userId) ->
-        _.find(users, id: userId)
+      groupUsers = group.links.users
+      group.users = groupUsers and groupUsers.map (userId) ->
+        _.find(allusers, id: userId)
       group
 
   fetchAndNormalizeStatuses = ->
@@ -215,14 +218,15 @@ module.exports = (robot) ->
     )
 
   robot.respond /(list projects|what projects do we have(?:\?))/, (msg) ->
+    msg.send('Checking...')
     authenticateAndFetchGroups().then((groups) ->
       groupNames = groups.map((group) -> group.name)
       sortedGroups = _.sortBy(groups, 'name')
       groupsText = sortedGroups.map((group) ->
-        markdownLink(
+        '- ' + markdownLink(
           group.name, pingboardUrl("group/#{group.id}")
         )
-      ).join(', ')
+      ).join('\n')
 
       msg.send(groupsText)
     ).catch((error) ->
@@ -231,6 +235,7 @@ module.exports = (robot) ->
     )
 
   robot.respond /who(?:'?s| is) on (.+)(?:\?)/, (msg) ->
+    msg.send('Checking...')
     projectName = msg.match[1]
     authenticateAndFetchGroups().then((groups) ->
       matchingGroup = _.max(groups, (group) ->
@@ -238,6 +243,7 @@ module.exports = (robot) ->
       )
       usersText = _.chain(matchingGroup.users)
         .compact()
+        .sortBy('first_name')
         .map((user) ->
           markdownLink(nameForUser(user), pingboardUrl("users/#{user.id}"))
         )
