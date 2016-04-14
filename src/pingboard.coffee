@@ -8,6 +8,8 @@
 #
 # Commands:
 #   hubot who's out - Lists who's working today.
+#   hubot who's on <project name> - Lists who's on a given project.
+#   hubot list projects - Lists projects at the company.
 #
 # Author:
 #   Jeremy Mack <jeremy.mack@postlight.com>
