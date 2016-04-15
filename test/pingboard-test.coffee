@@ -1,6 +1,6 @@
+require('es6-promise').polyfill()
 chai = require 'chai'
 Replay = require('replay')
-Promise = require 'bluebird'
 fetch = require 'isomorphic-fetch'
 
 expect = chai.expect

@@ -1,6 +1,5 @@
-Promise = require 'bluebird'
+require('es6-promise').polyfill()
 fetch = require 'isomorphic-fetch'
-fetch.Promise = Promise
 moment = require 'moment'
 URI = require 'urijs'
 
