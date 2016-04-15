@@ -11,6 +11,7 @@
 #   hubot who's out - Lists who's working today.
 #   hubot who's on <project name> - Lists who's on a given project.
 #   hubot list projects - Lists projects at the company.
+#   hubot what's <person name> working on? - Lists projects user is working on.
 #
 # Author:
 #   Jeremy Mack <jeremy.mack@postlight.com>
