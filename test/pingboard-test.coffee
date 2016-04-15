@@ -1,15 +1,19 @@
 chai = require 'chai'
 Replay = require('replay')
+Promise = require 'bluebird'
+fetch = require 'isomorphic-fetch'
 
 expect = chai.expect
-
-Helper = require('hubot-test-helper')
-helper = new Helper('../src/pingboard.coffee')
 
 # Used to trigger HTTP mocks
 process.env.HUBOT_PINGBOARD_USERNAME = 'test'
 process.env.HUBOT_PINGBOARD_PASSWORD = 'test'
 process.env.HUBOT_PINGBOARD_SUBDOMAIN = 'test'
+process.env.HUBOT_PINGBOARD_FLOWDOCK_FLOW_TOKEN = 'test'
+process.env.EXPRESS_PORT = 8080
+
+Helper = require('hubot-test-helper')
+helper = new Helper('../src/pingboard.coffee')
 
 # Wait long enough for the fixtures to work
 # TODO make this not a abitrary number and instead based on a promise.
@@ -94,4 +98,35 @@ describe 'pingboard', ->
           ]
         ])
         resolve()
+      , ASYNC_WAIT)
+
+  it "responds to 'who's on project 1?'", ->
+    checkStatus = (response) ->
+      if response.status >= 200 && response.status < 300
+        response
+      else
+        error = new Error(response.statusText)
+        error.response = response
+        throw error
+
+    new Promise (resolve, reject) ->
+      setTimeout(->
+        fetch('http://localhost:8080/hubot/pingboard-update',
+          headers: 'Content-Type': 'application/json'
+          method: 'POST'
+        )
+          .then(checkStatus)
+          .then((response) -> response.text())
+          .then((text) ->
+            expect(text).to.equal('OK')
+            resolve()
+          )
+          .catch((error) ->
+            console.log('Error', error)
+            error.response.text().then((text) ->
+              console.error('Error', text)
+              reject(error)
+            )
+            .catch(reject)
+          )
       , ASYNC_WAIT)

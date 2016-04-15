@@ -5,6 +5,7 @@
 #   HUBOT_PINGBOARD_USERNAME
 #   HUBOT_PINGBOARD_PASSWORD
 #   HUBOT_PINGBOARD_SUBDOMAIN
+#   HUBOT_PINGBOARD_FLOWDOCK_FLOW_TOKEN
 #
 # Commands:
 #   hubot who's out - Lists who's working today.
@@ -121,16 +122,24 @@ module.exports = (robot) ->
             title: title
             body: htmlMessage
         )) (error, postRes, body) ->
-          return new Error("Encountered an error :( #{error}") if error
+          if postRes?.statusCode >= 400 or error
+            errorMessage = ' '
+            if error
+              errorMessage = "Encountered an error :( #{error}"
+            else
+              console.log 'Error from Flowdock', body
+              errorMessage = 'Flowdock error: ' + body
 
-          if postRes.statusCode >= 400
-            console.log 'Error from Flowdock', body
-            return res.send 'FAILED'
+            res.status(400).send(errorMessage)
+
+            return
 
           try
             json = JSON.parse(body)
           catch error
-            return reject('Ran into an error parsing JSON for hubot-pingboard')
+            return res.status(400).send(
+              'Ran into an error parsing JSON for hubot-pingboard'
+            )
 
           res.send 'OK'
     ).catch((error) ->

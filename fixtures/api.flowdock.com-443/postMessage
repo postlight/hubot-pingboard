@@ -1,0 +1,22 @@
+POST /messages
+accept: application/json
+content-type: application/json
+host: api.flowdock.com
+
+HTTP/1.1 200 OK
+date: Fri, 15 Apr 2016 20:51:41 GMT
+server: Apache
+status: 404 Not Found
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+rate-limit-limit: 150
+rate-limit-remaining: 149
+content-type: application/json; charset=utf-8
+cache-control: private, no-store, no-cache
+x-runtime: 0.009200
+strict-transport-security: max-age=31557600
+transfer-encoding: chunked
+connection: close
+
+{"message":"Fake, worked"}
