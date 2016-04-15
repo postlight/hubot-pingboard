@@ -19,7 +19,13 @@ module.exports = function (grunt) {
       }
     },
     watch: {
-      files: ['Gruntfile.js', 'src/**/*.coffee', 'test/**/*.coffee'],
+      files: [
+        'Gruntfile.js',
+        'src/**/*.coffee',
+        'lib/**/*.coffee',
+        'fixtures/**/*',
+        'test/**/*.coffee'
+      ],
       tasks: ['test']
     }
   });
