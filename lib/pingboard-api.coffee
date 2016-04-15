@@ -1,5 +1,6 @@
 Promise = require 'bluebird'
 fetch = require 'isomorphic-fetch'
+fetch.Promise = Promise
 moment = require 'moment'
 URI = require 'urijs'
 
