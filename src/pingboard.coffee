@@ -57,6 +57,16 @@ module.exports = (robot) ->
         _.find(allUsers, id: userId)
       group
 
+  normalizeUsers = (data) ->
+    { users } = data
+    allGroups = data.linked.groups
+    users.map (user) ->
+      userGroups = user.links.groups
+      user.groups = userGroups and userGroups.map (groupId) ->
+        _.find(allGroups, id: groupId)
+      user.name = _.compact([user.first_name, user.last_name]).join(' ')
+      user
+
   formatStatusMessage = (allStatuses) ->
     statusesByType = _.groupBy(allStatuses, 'links.status_type')
     finalMessages = _.map statusesByType, (statuses) ->
@@ -200,6 +210,36 @@ module.exports = (robot) ->
         )
         ": "
         usersText
+      ].join(''))
+    ).catch((error) ->
+      console.log('hubot-pingboard error', error)
+      msg.send("Error in hubot-pingboard #{error}")
+    )
+
+  robot.respond /what(?:.s| is) (.+) working on(?:\?)/, (msg) ->
+    userName = msg.match[1]
+
+    pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
+    pingboardApi.fetchUsers().then((data) ->
+      users = normalizeUsers(data)
+      matchingUser = _.max(users, (user) -> user.name.score(userName))
+      groupsText = _.chain(matchingUser.groups)
+        .compact()
+        .sortBy('name')
+        .map((group) ->
+          markdownLink(
+            group.name, pingboardUrl("groups/#{group.id}")
+          )
+        )
+        .value()
+        .join(', ')
+
+      msg.send([
+        markdownLink(
+          matchingUser.name, pingboardUrl("users/#{matchingUser.id}")
+        )
+        " is working on "
+        groupsText
       ].join(''))
     ).catch((error) ->
       console.log('hubot-pingboard error', error)

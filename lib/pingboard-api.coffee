@@ -7,6 +7,7 @@ PINGBOARD_BASE_URL = 'https://app.pingboard.com'
 AUTH_ENDPOINT = 'oauth/token'
 STATUSES_ENDPOINT = 'api/v2/statuses'
 GROUPS_ENDPOINT = 'api/v2/groups'
+USERS_ENDPOINT = 'api/v2/users'
 
 
 module.exports = class PingboardApi
@@ -41,7 +42,15 @@ module.exports = class PingboardApi
           ends_at:       moment().format('YYYY-MM-DD')
       )
 
-  # fetchUsers: ->
+  fetchUsers: ->
+    @fetchAccessToken().then (accessToken) =>
+      @fetchEndpoint(
+        endpoint: USERS_ENDPOINT
+        params:
+          access_token:  accessToken
+          page_size:     '200'
+          include:       'groups'
+      )
 
   fetchAccessToken: ->
     @fetchEndpoint(

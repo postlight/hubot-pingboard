@@ -100,6 +100,25 @@ describe 'pingboard', ->
         resolve()
       , ASYNC_WAIT)
 
+  it "responds to 'what's test person 1 working on?'", ->
+    new Promise (resolve, reject) =>
+      @room.user.say 'alice', "@hubot what's test person 1 working on?"
+      setTimeout(=>
+        expect(@room.messages).to.deep.equal([
+          [
+            'alice'
+            "@hubot what's test person 1 working on?"
+          ],
+          [
+            'hubot'
+            # coffeelint: disable=max_line_length
+            '[Test Person](https://test.pingboard.com/users/1) is working on [Project 1](https://test.pingboard.com/groups/1), [Project 2](https://test.pingboard.com/groups/2)'
+            # coffeelint: enable=max_line_length
+          ]
+        ])
+        resolve()
+      , ASYNC_WAIT)
+
   it "responds to 'who's on project 1?'", ->
     checkStatus = (response) ->
       if response.status >= 200 && response.status < 300
