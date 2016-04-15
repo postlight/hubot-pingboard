@@ -50,11 +50,11 @@ module.exports = (robot) ->
 
   normalizeGroups = (data) ->
     { groups } = data
-    allusers = data.linked.users
+    allUsers = data.linked.users
     groups.map (group) ->
       groupUsers = group.links.users
       group.users = groupUsers and groupUsers.map (userId) ->
-        _.find(allusers, id: userId)
+        _.find(allUsers, id: userId)
       group
 
   formatStatusMessage = (allStatuses) ->
