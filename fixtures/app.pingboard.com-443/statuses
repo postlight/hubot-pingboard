@@ -1,6 +1,7 @@
-GET /api/v2/statuses?access_token=token&include=user%2Cstatus_type&page_size=2000&starts_at=2016-04-14&ends_at=2016-04-14
+GET /api/v2/statuses?access_token=token&include=user%2Cstatus_type&page_size=2000&starts_at=2016-04-15&ends_at=2016-04-15
 content-type: application/json
-host: app.pingboard.com
+accept-encoding: gzip,deflate
+accept: */*
 
 HTTP/1.1 200 OK
 server: Cowboy

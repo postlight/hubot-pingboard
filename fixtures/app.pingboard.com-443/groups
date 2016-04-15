@@ -1,6 +1,7 @@
-GET /api/v2/groups?access_token=token&include=users&type=group&sort=name&page_size=100
+GET /api/v2/groups?access_token=token&include=users&page_size=100&sort=name&type=group
 content-type: application/json
-host: app.pingboard.com
+accept-encoding: gzip,deflate
+accept: */*
 
 HTTP/1.1 200 OK
 server: Cowboy

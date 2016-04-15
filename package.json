@@ -14,9 +14,11 @@
   },
   "dependencies": {
     "bluebird": "^3.0.5",
+    "isomorphic-fetch": "2.2.1",
     "lodash": "^3.10.1",
     "marked": "^0.3.5",
-    "moment": "^2.10.6"
+    "moment": "^2.10.6",
+    "urijs": "1.17.1"
   },
   "peerDependencies": {
     "hubot": "2.x"
@@ -34,8 +36,6 @@
     "matchdep": "~0.3.0",
     "mocha": "^2.1.0",
     "replay": "2.0.6",
-    "sinon": "^1.13.0",
-    "sinon-chai": "^2.7.0",
     "string_score": "0.1.22"
   },
   "main": "index.coffee",

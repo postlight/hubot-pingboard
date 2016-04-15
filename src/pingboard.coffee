@@ -14,80 +14,20 @@
 # Author:
 #   Jeremy Mack <jeremy.mack@postlight.com>
 
-Promise = require 'bluebird'
 moment = require 'moment'
 _ = require 'lodash'
 marked = require 'marked'
 # add score method to string.
 require 'string_score'
 
-PINGBOARD_BASE_URL = 'https://app.pingboard.com'
-AUTH_URL = "#{PINGBOARD_BASE_URL}/oauth/token"
-STATUSES_ENDPOINT = 'api/v2/statuses'
-GROUPS_ENDPOINT = 'api/v2/groups'
+PingboardApi = require '../lib/pingboard-api'
+
 MULTI_DAY_FORMAT = 'ddd M/D'
+USERNAME = process.env.HUBOT_PINGBOARD_USERNAME
+PASSWORD = process.env.HUBOT_PINGBOARD_PASSWORD
 SUBDOMAIN = process.env.HUBOT_PINGBOARD_SUBDOMAIN
 
 module.exports = (robot) ->
-  fetchAccessToken = ->
-    username = process.env.HUBOT_PINGBOARD_USERNAME
-    password = process.env.HUBOT_PINGBOARD_PASSWORD
-
-    if !username or !password
-      return Promise.reject('Missing username or password for hubot-pingboard')
-
-    new Promise (resolve, reject) ->
-      robot.http(AUTH_URL)
-        .header('Content-Type', 'application/json')
-        .query(username: username, password: password, grant_type: 'password')
-        .post() (error, res, body) ->
-          return reject("Encountered an error :( #{error}") if error
-
-          try
-            json = JSON.parse(body)
-          catch error
-            return reject('Ran into an error parsing JSON for hubot-pingboard')
-
-          resolve(json.access_token)
-
-  fetchPingboardEndpoint = ({ endpoint, params }) ->
-    new Promise (resolve, reject) ->
-      robot.http("#{PINGBOARD_BASE_URL}/#{endpoint}")
-        .header('Content-Type', 'application/json')
-        .query(params)
-        .get() (error, res, body) ->
-          return reject("Encountered an error :( #{error}") if error
-
-          try
-            json = JSON.parse(body)
-          catch error
-            return new Error(
-              'Ran into an error parsing JSON for hubot-pingboard'
-            )
-
-          resolve(json)
-
-  fetchStatuses = (accessToken) ->
-    fetchPingboardEndpoint(
-      endpoint: STATUSES_ENDPOINT
-      params:
-        access_token:  accessToken
-        include:       'user,status_type'
-        page_size:     '2000'
-        starts_at:     moment().format('YYYY-MM-DD')
-        ends_at:       moment().format('YYYY-MM-DD')
-    )
-
-  fetchGroups = (accessToken) ->
-    fetchPingboardEndpoint(
-      endpoint: GROUPS_ENDPOINT
-      params:
-        access_token:  accessToken
-        include:       'users'
-        type:          'group'
-        sort:          'name'
-        page_size:     '100'
-    )
 
   nameForUser = (user) ->
     _.compact([user.first_name, user.last_name]).join(' ')
@@ -115,21 +55,6 @@ module.exports = (robot) ->
       group.users = groupUsers and groupUsers.map (userId) ->
         _.find(allusers, id: userId)
       group
-
-  fetchAndNormalizeStatuses = ->
-    fetchAccessToken().then((accessToken) ->
-      fetchStatuses(accessToken)
-    ).then((data) ->
-      allStatuses = normalizeStatuses(data)
-      formatStatusMessage(allStatuses)
-    )
-
-  authenticateAndFetchGroups = ->
-    fetchAccessToken().then((accessToken) ->
-      fetchGroups(accessToken)
-    ).then((data) ->
-      normalizeGroups(data)
-    )
 
   formatStatusMessage = (allStatuses) ->
     statusesByType = _.groupBy(allStatuses, 'links.status_type')
@@ -167,7 +92,11 @@ module.exports = (robot) ->
     finalMessages.join('\n')
 
   robot.router.post '/hubot/pingboard-update', (req, res) ->
-    fetchAndNormalizeStatuses().then((message) ->
+    pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
+    pingboardApi.fetchStatuses().then((data) ->
+      allStatuses = normalizeStatuses(data)
+      message = formatStatusMessage(allStatuses)
+
       now = moment()
       title = "Statuses for #{now.format('MMMM Do, YYYY')}"
       htmlMessage = marked(message)
@@ -206,11 +135,14 @@ module.exports = (robot) ->
           res.send 'OK'
     ).catch((error) ->
       console.log('hubot-pingboard error', error)
-      res.send 'FAILED'
+      res.send 'hubot-pingboard: Updating statuses'
     )
 
   robot.respond /who.s out(?:\?)/, (msg) ->
-    fetchAndNormalizeStatuses().then((message) ->
+    pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
+    pingboardApi.fetchStatuses().then((data) ->
+      allStatuses = normalizeStatuses(data)
+      message = formatStatusMessage(allStatuses)
       msg.send(message)
     ).catch((error) ->
       console.log('hubot-pingboard error', error)
@@ -218,8 +150,9 @@ module.exports = (robot) ->
     )
 
   robot.respond /(list projects|what projects do we have(?:\?))/, (msg) ->
-    msg.send('Checking...')
-    authenticateAndFetchGroups().then((groups) ->
+    pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
+    pingboardApi.fetchGroups().then((data) ->
+      groups = normalizeGroups(data)
       groupNames = groups.map((group) -> group.name)
       sortedGroups = _.sortBy(groups, 'name')
       groupsText = sortedGroups.map((group) ->
@@ -235,9 +168,11 @@ module.exports = (robot) ->
     )
 
   robot.respond /who(?:.s| is) on (.+)(?:\?)/, (msg) ->
-    msg.send('Checking...')
     projectName = msg.match[1]
-    authenticateAndFetchGroups().then((groups) ->
+
+    pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
+    pingboardApi.fetchGroups().then((data) ->
+      groups = normalizeGroups(data)
       matchingGroup = _.max(groups, (group) ->
         group.name.score(projectName)
       )

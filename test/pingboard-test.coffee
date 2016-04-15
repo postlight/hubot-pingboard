@@ -1,6 +1,4 @@
 chai = require 'chai'
-sinon = require 'sinon'
-chai.use require 'sinon-chai'
 Replay = require('replay')
 
 expect = chai.expect
@@ -52,10 +50,6 @@ describe 'pingboard', ->
           ],
           [
             'hubot'
-            'Checking...'
-          ],
-          [
-            'hubot'
             # coffeelint: disable=max_line_length
             '- [Project 1](https://test.pingboard.com/groups/1)\n- [Project 2](https://test.pingboard.com/groups/1)'
             # coffeelint: enable=max_line_length
@@ -75,10 +69,6 @@ describe 'pingboard', ->
           ],
           [
             'hubot'
-            'Checking...'
-          ],
-          [
-            'hubot'
             # coffeelint: disable=max_line_length
             '[Project 2](https://test.pingboard.com/groups/1): [Test Person](https://test.pingboard.com/users/1), [Test Person 2](https://test.pingboard.com/users/2), [Test Person 3](https://test.pingboard.com/users/3)'
             # coffeelint: enable=max_line_length
@@ -95,10 +85,6 @@ describe 'pingboard', ->
           [
             'alice'
             "@hubot who's on project 1?"
-          ],
-          [
-            'hubot'
-            'Checking...'
           ],
           [
             'hubot'

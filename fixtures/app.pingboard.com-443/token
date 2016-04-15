@@ -1,6 +1,7 @@
-POST /oauth/token?username=test&password=test&grant_type=password
+POST /oauth/token?grant_type=password&password=test&username=test
 content-type: application/json
-host: app.pingboard.com
+accept-encoding: gzip,deflate
+accept: */*
 
 HTTP/1.1 200 OK
 server: Cowboy
