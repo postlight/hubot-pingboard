@@ -158,7 +158,7 @@ module.exports = (robot) ->
       res.send 'hubot-pingboard: Updating statuses'
     )
 
-  robot.respond /who.s out(?:\?)/, (msg) ->
+  robot.respond /who.?s out(?:\?)?/, (msg) ->
     pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
     pingboardApi.fetchStatuses().then((data) ->
       allStatuses = normalizeStatuses(data)
@@ -169,7 +169,7 @@ module.exports = (robot) ->
       msg.send("Error in hubot-pingboard #{error}")
     )
 
-  robot.respond /(list projects|what projects do we have(?:\?))/, (msg) ->
+  robot.respond /(list projects|what projects do we have(?:\?)?)/, (msg) ->
     pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
     pingboardApi.fetchGroups().then((data) ->
       groups = normalizeGroups(data)
@@ -187,7 +187,7 @@ module.exports = (robot) ->
       msg.send("Error in hubot-pingboard #{error}")
     )
 
-  robot.respond /who(?:.s| is) on (.+)(?:\?)/, (msg) ->
+  robot.respond /who(?:.s| is) on (.+?)(?:\?)?/, (msg) ->
     projectName = msg.match[1]
 
     pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
@@ -217,7 +217,7 @@ module.exports = (robot) ->
       msg.send("Error in hubot-pingboard #{error}")
     )
 
-  robot.respond /what(?:.s| is) (.+) working on(?:\?)/, (msg) ->
+  robot.respond /what(?:.s| is) (.+) working on(?:\?)?/, (msg) ->
     userName = msg.match[1]
 
     pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
