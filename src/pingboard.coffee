@@ -193,11 +193,9 @@ module.exports = (robot) ->
       groups = normalizeGroups(data)
       groupNames = groups.map((group) -> group.name)
       sortedGroups = _.sortBy(groups, 'name')
-      groupsText = sortedGroups.map((group) ->
-        '- ' + markdownLink(
-          group.name, pingboardUrl("groups/#{group.id}")
-        )
-      ).join('\n')
+      groupsText = sortedGroups
+        .map((group) -> "- #{messageForGroup(group)}")
+        .join('\n')
 
       msg.send(groupsText)
     ).catch((error) ->
