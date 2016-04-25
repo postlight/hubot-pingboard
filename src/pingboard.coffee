@@ -56,8 +56,7 @@ module.exports = (robot) ->
       markdownLink(
         group.name, pingboardUrl("groups/#{group.id}")
       )
-      ": "
-      usersText
+      ": #{usersText}" if usersText
     ].join('')
 
   normalizeStatuses = (data) ->
