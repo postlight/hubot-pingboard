@@ -40,6 +40,24 @@ module.exports = (robot) ->
   markdownLink = (text, url) ->
     "[#{text}](#{url})"
 
+  messageForGroup = (group) ->
+    usersText = _.chain(group.users)
+      .compact()
+      .sortBy('first_name')
+      .map((user) ->
+        markdownLink(nameForUser(user), pingboardUrl("users/#{user.id}"))
+      )
+      .value()
+      .join(', ')
+
+    [
+      markdownLink(
+        group.name, pingboardUrl("groups/#{group.id}")
+      )
+      ": "
+      usersText
+    ].join('')
+
   normalizeStatuses = (data) ->
     { statuses } = data
     users = data.linked.users
@@ -196,22 +214,8 @@ module.exports = (robot) ->
       matchingGroup = _.max(groups, (group) ->
         group.name.score(projectName)
       )
-      usersText = _.chain(matchingGroup.users)
-        .compact()
-        .sortBy('first_name')
-        .map((user) ->
-          markdownLink(nameForUser(user), pingboardUrl("users/#{user.id}"))
-        )
-        .value()
-        .join(', ')
 
-      msg.send([
-        markdownLink(
-          matchingGroup.name, pingboardUrl("groups/#{matchingGroup.id}")
-        )
-        ": "
-        usersText
-      ].join(''))
+      msg.send(messageForGroup(matchingGroup))
     ).catch((error) ->
       console.log('hubot-pingboard error', error)
       msg.send("Error in hubot-pingboard #{error}")
