@@ -10,6 +10,7 @@ process.env.HUBOT_PINGBOARD_USERNAME = 'test'
 process.env.HUBOT_PINGBOARD_PASSWORD = 'test'
 process.env.HUBOT_PINGBOARD_SUBDOMAIN = 'test'
 process.env.HUBOT_PINGBOARD_FLOWDOCK_FLOW_TOKEN = 'test'
+process.env.HUBOT_PINGBOARD_IGNORED_GROUPS = 'Ignored Project'
 process.env.EXPRESS_PORT = 8080
 
 Helper = require('hubot-test-helper')

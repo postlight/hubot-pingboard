@@ -6,6 +6,7 @@
 #   HUBOT_PINGBOARD_PASSWORD
 #   HUBOT_PINGBOARD_SUBDOMAIN
 #   HUBOT_PINGBOARD_FLOWDOCK_FLOW_TOKEN
+#   HUBOT_PINGBOARD_IGNORED_GROUPS - Comma list of group names to ignore.
 #
 # Commands:
 #   hubot who's out - Lists who's working today.
@@ -28,6 +29,7 @@ MULTI_DAY_FORMAT = 'ddd M/D'
 USERNAME = process.env.HUBOT_PINGBOARD_USERNAME
 PASSWORD = process.env.HUBOT_PINGBOARD_PASSWORD
 SUBDOMAIN = process.env.HUBOT_PINGBOARD_SUBDOMAIN
+IGNORED_GROUPS = process.env.HUBOT_PINGBOARD_IGNORED_GROUPS?.split(',')
 
 module.exports = (robot) ->
 
@@ -70,6 +72,9 @@ module.exports = (robot) ->
   normalizeGroups = (data) ->
     { groups } = data
     allUsers = data.linked.users
+    groups = _.reject(groups, (group) ->
+      _.include(IGNORED_GROUPS, group.name)
+    )
     groups.map (group) ->
       groupUsers = group.links.users
       group.users = groupUsers and groupUsers.map (userId) ->

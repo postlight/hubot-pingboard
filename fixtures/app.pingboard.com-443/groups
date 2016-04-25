@@ -54,6 +54,22 @@ via: 1.1 vegur
       "visible_to_other": false,
       "editable_by_owner": false,
       "links": { "users": ["1", "2", "3"] }
+    },
+    {
+      "id": "3",
+      "name": "Ignored Project",
+      "description": "",
+      "created_at": "2016-04-14T17:58:01Z",
+      "updated_at": "2016-04-14T17:58:01Z",
+      "memberships_count": 3,
+      "logo_urls": null,
+      "type": "group",
+      "custom_fields": { },
+      "visible_to_owner": true,
+      "visible_to_group": true,
+      "visible_to_other": false,
+      "editable_by_owner": false,
+      "links": { "users": ["1", "2", "3"] }
     }
   ],
   "links": { "groups.users": { "href": "/api/v2/users?group_id={groups.id}", "type": "users" } },
