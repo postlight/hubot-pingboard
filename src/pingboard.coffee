@@ -39,8 +39,9 @@ module.exports = (robot) ->
   pingboardUrl = (path) ->
     "https://#{SUBDOMAIN}.pingboard.com/#{path}"
 
-  markdownLink = (text, url) ->
-    "[#{text}](#{url})"
+  markdownLink = (text, url) -> "[#{text}](#{url})"
+
+  markdownBold = (text) -> "**#{text}**"
 
   messageForGroup = (group) ->
     usersText = _.chain(group.users)
@@ -53,9 +54,9 @@ module.exports = (robot) ->
       .join(', ')
 
     [
-      markdownLink(
+      markdownBold(markdownLink(
         group.name, pingboardUrl("groups/#{group.id}")
-      )
+      ))
       ": #{usersText}" if usersText
     ].join('')
 
@@ -242,9 +243,9 @@ module.exports = (robot) ->
         .join(', ')
 
       msg.send([
-        markdownLink(
+        markdownBold(markdownLink(
           matchingUser.name, pingboardUrl("users/#{matchingUser.id}")
-        )
+        ))
         " is working on "
         groupsText
       ].join(''))
