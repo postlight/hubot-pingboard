@@ -1,0 +1,64 @@
+GET REGEXP /\/api\/v2\/statuses.*user_id=test3.*/
+content-type: application/json
+accept-encoding: gzip,deflate
+accept: */*
+
+HTTP/1.1 200 OK
+server: Cowboy
+connection: close
+date: Thu, 14 Apr 2016 19:55:16 GMT
+status: 200 OK
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-pingboard-analytic-id: 106978
+etag: "55b9392e4ef7e327ad6780d8a4969bdf"
+content-type: application/json; charset=utf-8
+cache-control: max-age=0, private, must-revalidate
+vary: Accept-Encoding
+x-request-id: 9a570268-5008-4c01-8712-99079632a421
+x-runtime: 0.094659
+strict-transport-security: max-age=31536000
+via: 1.1 vegur
+
+{
+  "statuses": [],
+  "links": {
+    "statuses.status_type": {
+      "href": "/api/v2/status_types/{statuses.status_type}",
+      "type": "status_types"
+    },
+    "statuses.user": {
+      "href": "/api/v2/users/{statuses.user}",
+      "type": "users"
+    },
+    "users.groups": {
+      "href": "/api/v2/groups?user_id={users.id}",
+      "type": "groups"
+    },
+    "users.linked_accounts": {
+      "href": "/api/v2/linked_accounts?user_id={users.id}",
+      "type": "linked_accounts"
+    },
+    "users.locations": {
+      "href": "/api/v2/locations?user_id={users.id}",
+      "type": "locations"
+    },
+    "users.statuses": {
+      "href": "/api/v2/statuses?user_id={users.id}",
+      "type": "statuses"
+    }
+  },
+  "meta": {
+    "statuses": {
+      "page": 1,
+      "page_size": 5,
+      "count": 0,
+      "page_count": 0,
+      "first_href": "/api/v2/statuses?ends_at=2016-05-05&include=user%2Cstatus_type&page_size=5&starts_at=2016-05-05&user_id=106978",
+      "previous_href": null,
+      "next_href": null,
+      "last_href": "/api/v2/statuses?ends_at=2016-05-05&include=user%2Cstatus_type&page=0&page_size=5&starts_at=2016-05-05&user_id=106978"
+    }
+  }
+}

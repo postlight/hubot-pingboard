@@ -1,0 +1,123 @@
+GET REGEXP /\/api\/v2\/statuses.*user_id=test1.*/
+content-type: application/json
+accept-encoding: gzip,deflate
+accept: */*
+
+HTTP/1.1 200 OK
+server: Cowboy
+connection: close
+date: Thu, 14 Apr 2016 19:55:16 GMT
+status: 200 OK
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+x-content-type-options: nosniff
+x-pingboard-analytic-id: 106978
+etag: "55b9392e4ef7e327ad6780d8a4969bdf"
+content-type: application/json; charset=utf-8
+cache-control: max-age=0, private, must-revalidate
+vary: Accept-Encoding
+x-request-id: 9a570268-5008-4c01-8712-99079632a421
+x-runtime: 0.094659
+strict-transport-security: max-age=31536000
+via: 1.1 vegur
+
+{
+  "statuses": [
+    {
+      "id": "1",
+      "user_id": 1,
+      "message": "Running Errand",
+      "starts_at": "2016-04-11T11:00:00Z",
+      "ends_at": "2016-04-22T23:00:00Z",
+      "time_period": "another_time",
+      "all_day": true,
+      "created_at": "2016-04-11T13:18:13Z",
+      "updated_at": "2016-04-11T13:18:13Z",
+      "status_type_id": 1,
+      "created_by_id": 1,
+      "links": { "status_type": "2", "user": "1" }
+    }
+  ],
+  "linked": {
+    "users": [
+      {
+        "id": "1",
+        "created_at": "2015-09-23T05:08:12Z",
+        "updated_at": "2016-04-14T12:31:16Z",
+        "roles": [ ],
+        "phone_message_channel": true,
+        "email_message_channel": true,
+        "social_avatar_id": 1,
+        "avatar_urls": {
+          "original": "https://example.com/test.png",
+          "xxlarge": "https://example.com/test.png",
+          "xlarge": "https://example.com/test.png",
+          "large": "https://example.com/test.png",
+          "medium": "https://example.com/test.png",
+          "small": "https://example.com/test.png",
+          "icon": "https://example.com/test.png",
+          "blurred": "https://example.com/test.png"
+        },
+        "avatar_original_size": [480, 480],
+        "start_date": "2015-10-01",
+        "birth_date": "0000-05-09",
+        "time_zone": "America/New_York",
+        "first_name": "Test",
+        "last_name": "Person 1",
+        "nickname": "",
+        "email": "test@example.com",
+        "phone": "+5555555555",
+        "job_title": "Developer",
+        "reports_to_id": null,
+        "bio": "",
+        "skills": [ ],
+        "interests": [ ],
+        "custom_fields": { "f43393": null },
+        "links": {
+          "groups": ["1"],
+          "linked_accounts": ["1"],
+          "locations": ["1"],
+          "statuses": [ "1" ]
+        }
+      }
+    ],
+    "status_types": [
+      {
+        "id": "1",
+        "slug": "vacation",
+        "name": "Vacation",
+        "placeholder": "Awesome! Where are you headed?",
+        "available": false,
+        "sort_order": 1
+      },
+      {
+        "id": "2",
+        "slug": "out-of-office",
+        "name": "Out of Office",
+        "placeholder": "Why are you gone?",
+        "available": false,
+        "sort_order": 1
+      }
+    ]
+  },
+  "links": {
+    "statuses.status_type": { "href": "/api/v2/status_types/{statuses.status_type}", "type": "status_types" },
+    "statuses.user": { "href": "/api/v2/users/{statuses.user}", "type": "users" },
+    "users.groups": { "href": "/api/v2/groups?user_id={users.id}", "type": "groups" },
+    "users.linked_accounts": { "href": "/api/v2/linked_accounts?user_id={users.id}", "type": "linked_accounts" },
+    "users.locations": { "href": "/api/v2/locations?user_id={users.id}", "type": "locations" },
+    "users.statuses": { "href": "/api/v2/statuses?user_id={users.id}", "type": "statuses" }
+  },
+  "meta": {
+    "statuses": {
+      "page": 1,
+      "page_size": 2000,
+      "count": 11,
+      "page_count": 1,
+      "first_href": "/api/v2/statuses?ends_at=2016-04-14&include=user%2Cstatus_type&page_size=2000&starts_at=2016-04-14",
+      "previous_href": null,
+      "next_href": null,
+      "last_href": "/api/v2/statuses?ends_at=2016-04-14&include=user%2Cstatus_type&page_size=2000&starts_at=2016-04-14"
+    }
+  }
+}

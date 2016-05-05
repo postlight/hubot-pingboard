@@ -3,6 +3,9 @@ chai = require 'chai'
 Replay = require('replay')
 fetch = require 'isomorphic-fetch'
 
+MockDate = require('mockdate')
+MockDate.set('5/5/2016')
+
 expect = chai.expect
 
 # Used to trigger HTTP mocks
@@ -12,6 +15,9 @@ process.env.HUBOT_PINGBOARD_SUBDOMAIN = 'test'
 process.env.HUBOT_PINGBOARD_FLOWDOCK_FLOW_TOKEN = 'test'
 process.env.HUBOT_PINGBOARD_IGNORED_GROUPS = 'Ignored Project'
 process.env.EXPRESS_PORT = 8080
+process.env.HUBOT_PINGBOARD_USERS_MAP =
+  'test1:test1,test2:test2,test3:test3,test4:test4'
+process.env.TZ = 'America/New_York'
 
 Helper = require('hubot-test-helper')
 helper = new Helper('../src/pingboard.coffee')
@@ -149,4 +155,84 @@ describe 'pingboard', ->
             )
             .catch(reject)
           )
+      , ASYNC_WAIT)
+
+  it 'responds to @mentions of users on vacation', ->
+    new Promise (resolve, reject) =>
+      message = '@test1 quick question'
+      @room.user.say 'alice', message
+      setTimeout(=>
+        expect(@room.messages).to.deep.equal([
+          [
+            'alice'
+            message
+          ],
+          [
+            'hubot'
+            # coffeelint: disable=max_line_length
+            '@alice [Test Person 1](https://test.pingboard.com/users/1) is Out of Office (Running Errand) until Friday, April 22nd'
+            # coffeelint: enable=max_line_length
+          ]
+        ])
+        resolve()
+      , ASYNC_WAIT)
+
+  it 'responds to @mentions of users on vacation with two users', ->
+    new Promise (resolve, reject) =>
+      message = '@test1, @test2 quick question'
+      @room.user.say 'alice', message
+      setTimeout(=>
+        expect(@room.messages).to.deep.equal([
+          [
+            'alice'
+            message
+          ],
+          [
+            'hubot'
+            # coffeelint: disable=max_line_length
+            '@alice [Test Person 1](https://test.pingboard.com/users/1) is Out of Office (Running Errand) until Friday, April 22nd'
+            # coffeelint: enable=max_line_length
+          ]
+          [
+            'hubot'
+            # coffeelint: disable=max_line_length
+            '@alice [Test Person 2](https://test.pingboard.com/users/2) is on Vacation (Hawaii) until Friday, April 22nd'
+            # coffeelint: enable=max_line_length
+          ]
+        ])
+        resolve()
+      , ASYNC_WAIT)
+
+  it 'does not respond to @mention user with no status', ->
+    new Promise (resolve, reject) =>
+      message = '@test3 quick question'
+      @room.user.say 'alice', message
+      setTimeout(=>
+        expect(@room.messages).to.deep.equal([
+          [
+            'alice'
+            message
+          ]
+        ])
+        resolve()
+      , ASYNC_WAIT)
+
+  it "responds to @mention of user who's out right now with timestamp", ->
+    new Promise (resolve, reject) =>
+      message = '@test4 quick question'
+      @room.user.say 'alice', message
+      setTimeout(=>
+        expect(@room.messages).to.deep.equal([
+          [
+            'alice'
+            message
+          ],
+          [
+            'hubot'
+            # coffeelint: disable=max_line_length
+            '@alice [Test Person 4](https://test.pingboard.com/users/4) is Out of Office (Doctor) until 11:00am EDT'
+            # coffeelint: enable=max_line_length
+          ]
+        ])
+        resolve()
       , ASYNC_WAIT)

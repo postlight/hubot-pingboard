@@ -17,7 +17,8 @@
 # Author:
 #   Jeremy Mack <jeremy.mack@postlight.com>
 
-moment = require 'moment'
+moment = require 'moment-timezone'
+moment.tz.setDefault(process.env.TZ) if process.env.TZ
 _ = require 'lodash'
 marked = require 'marked'
 # add score method to string.
@@ -31,6 +32,22 @@ PASSWORD = process.env.HUBOT_PINGBOARD_PASSWORD
 SUBDOMAIN = process.env.HUBOT_PINGBOARD_SUBDOMAIN
 IGNORED_GROUPS = process.env.HUBOT_PINGBOARD_IGNORED_GROUPS?.split(',')
 
+# TODO Replace with an automated way to gather this info. Perhaps Flowdock's
+# API or better, a custom field in Pingboard for chat username.
+usersMapString = process.env.HUBOT_PINGBOARD_USERS_MAP
+if usersMapString
+  USERNAMES_TO_PINGBOARD =
+    usersMapString.split(',').map((usernameAndPingboardUserId) ->
+      [ username, pingboardUserId ] = usernameAndPingboardUserId.split(':')
+      username: username, pingboardUserId: pingboardUserId
+    )
+
+  usernamesString = USERNAMES_TO_PINGBOARD.map((u) -> u.username).join('|')
+  USERNAMES_REGEX = new RegExp("@(#{usernamesString})", 'ig')
+
+STATUS_TYPE_VERBS =
+  'Vacation': 'on Vacation'
+
 module.exports = (robot) ->
 
   nameForUser = (user) ->
@@ -42,6 +59,9 @@ module.exports = (robot) ->
   markdownLink = (text, url) -> "[#{text}](#{url})"
 
   markdownBold = (text) -> "**#{text}**"
+
+  humanStatusType = (statusType) ->
+    STATUS_TYPE_VERBS[statusType] or statusType
 
   messageForGroup = (group) ->
     usersText = _.chain(group.users)
@@ -62,8 +82,8 @@ module.exports = (robot) ->
 
   normalizeStatuses = (data) ->
     { statuses } = data
-    users = data.linked.users
-    statusTypes = data.linked.status_types
+    users = data.linked?.users
+    statusTypes = data.linked?.status_types
     statuses.map (status) ->
       status.user = _.find(users, id: status.links.user)
       status.statusType = _.find(statusTypes, id: status.links.status_type)
@@ -191,6 +211,54 @@ module.exports = (robot) ->
       console.log('hubot-pingboard error', error)
       msg.send("Error in hubot-pingboard #{error}")
     )
+
+  robot.hear(USERNAMES_REGEX, (msg) ->
+    pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
+
+    return unless msg.match.length > 0
+
+    msg.match.forEach (username) ->
+      user = _.find USERNAMES_TO_PINGBOARD, username: username.replace('@','')
+
+      pingboardApi.fetchStatuesForUserId(user.pingboardUserId).then((data) ->
+        allStatuses = normalizeStatuses(data)
+        unavailableStatuses = _.filter(
+          allStatuses, 'statusType.available', false
+        )
+
+        return if unavailableStatuses.length == 0
+
+        firstUnavailableStatus = unavailableStatuses[0]
+        user = firstUnavailableStatus.user
+        startsMoment = moment(firstUnavailableStatus.starts_at)
+        endsMoment = moment(firstUnavailableStatus.ends_at)
+
+        isMultiDay = (
+          firstUnavailableStatus.all_day and
+          !startsMoment.isSame(endsMoment, 'day')
+        )
+
+        if isMultiDay
+          timeText = endsMoment.format('dddd, MMMM Do')
+        else if startsMoment.isBefore(moment()) and endsMoment.isAfter()
+          timeText = endsMoment.format('h:mma z')
+        else
+          # Don't print anything if the moment of being out has past.
+          return
+
+        msg.reply([
+          markdownLink(nameForUser(user), pingboardUrl("users/#{user.id}"))
+          'is'
+          humanStatusType(firstUnavailableStatus.statusType.name)
+          "(#{firstUnavailableStatus.message})"
+          'until'
+          timeText
+        ].join(' '))
+      ).catch((error) ->
+        console.log('hubot-pingboard error', error)
+        msg.send("Error in hubot-pingboard #{error}")
+      )
+  ) if USERNAMES_REGEX # Don't apply this with an empty regex
 
   robot.respond /(list projects|what projects do we have(?:\?)?)/, (msg) ->
     pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
