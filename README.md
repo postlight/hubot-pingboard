@@ -21,19 +21,25 @@ Then add **hubot-pingboard** to your `external-scripts.json`:
 ## Sample Interaction
 
 ```
+# List projects.
 user1>> hubot list projects
-hubot>> 
+hubot>>
 
 - Project 1: Person1, Person2
 - Project 2: Person3
 
 
-
+# What's someone working on?
 user1>> hubot what's person1 working on?
 hubot>> Person1: Project1, Person2
 
 
+# Who's on a project?
+user1>> hubot who's on Project1?
+hubot>> Project1: Person1, Person2
 
+
+# Who's out today?
 user1>> hubot who's out?
 hubot>>
 ## Remote
