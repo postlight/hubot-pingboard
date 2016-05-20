@@ -11,6 +11,13 @@ GROUPS_ENDPOINT = 'api/v2/groups'
 USERS_ENDPOINT = 'api/v2/users'
 PINGBOARD_DATE_FORMAT = 'YYYY-MM-DD'
 
+checkStatus = (response) ->
+  if response.status >= 200 && response.status < 300
+    response
+  else
+    error = new Error(response.statusText)
+    error.response = response
+    throw error
 
 module.exports = class PingboardApi
   constructor: ({ username, password }) ->
@@ -85,5 +92,6 @@ module.exports = class PingboardApi
       headers: 'Content-Type': 'application/json'
       method: method
     )
+      .then(checkStatus)
       .then((response) -> response.json())
       .then((json) -> json)
