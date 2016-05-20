@@ -220,7 +220,7 @@ module.exports = (robot) ->
     msg.match.forEach (username) ->
       user = _.find USERNAMES_TO_PINGBOARD, username: username.replace('@','')
 
-      pingboardApi.fetchStatuesForUserId(user.pingboardUserId).then((data) ->
+      pingboardApi.fetchStatusesForUserId(user.pingboardUserId).then((data) ->
         allStatuses = normalizeStatuses(data)
         unavailableStatuses = _.filter(
           allStatuses, 'statusType.available', false

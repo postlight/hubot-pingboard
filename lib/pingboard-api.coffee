@@ -44,7 +44,7 @@ module.exports = class PingboardApi
           ends_at:       moment().format(PINGBOARD_DATE_FORMAT)
       )
 
-  fetchStatuesForUserId: (userId) ->
+  fetchStatusesForUserId: (userId) ->
     @fetchAccessToken().then (accessToken) =>
       @fetchEndpoint(
         endpoint: STATUSES_ENDPOINT
