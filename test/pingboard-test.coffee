@@ -9,8 +9,8 @@ MockDate.set('5/5/2016')
 expect = chai.expect
 
 # Used to trigger HTTP mocks
-process.env.HUBOT_PINGBOARD_USERNAME = 'test'
-process.env.HUBOT_PINGBOARD_PASSWORD = 'test'
+process.env.HUBOT_PINGBOARD_CLIENT_ID = 'test'
+process.env.HUBOT_PINGBOARD_CLIENT_SECRET = 'test'
 process.env.HUBOT_PINGBOARD_SUBDOMAIN = 'test'
 process.env.HUBOT_PINGBOARD_FLOWDOCK_FLOW_TOKEN = 'test'
 process.env.HUBOT_PINGBOARD_IGNORED_GROUPS = 'Ignored Project'

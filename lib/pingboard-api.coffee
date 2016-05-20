@@ -20,12 +20,12 @@ checkStatus = (response) ->
     throw error
 
 module.exports = class PingboardApi
-  constructor: ({ username, password }) ->
-    if !username or !password
-      throw new Error('username and password required')
+  constructor: ({ clientId, clientSecret }) ->
+    if !clientId or !clientSecret
+      throw new Error('clientId and clientSecret required')
 
-    @username = username
-    @password = password
+    @clientId = clientId
+    @clientSecret = clientSecret
 
   fetchGroups: ->
     @fetchAccessToken().then (accessToken) =>
@@ -77,20 +77,31 @@ module.exports = class PingboardApi
   fetchAccessToken: ->
     @fetchEndpoint(
       endpoint: AUTH_ENDPOINT
+      headers:
+        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
       method: 'POST'
-      params:
-        grant_type: 'password'
-        password: @password
-        username: @username
+      body:
+        client_id: @clientId
+        client_secret: @clientSecret
+        grant_type: 'client_credentials'
     ).then((json) -> json.access_token)
 
-  fetchEndpoint: ({ endpoint, params, method }) ->
+  fetchEndpoint: ({ body, endpoint, headers, params, method }) ->
     method ?= 'GET'
+    headers ?= 'Content-Type': 'application/json'
+
     uri = new URI("#{PINGBOARD_BASE_URL}/#{endpoint}")
-    uri.setQuery(params)
+    uri.setQuery(params) if params
+
+    if body
+      form = for key, value of body
+        "#{key}=#{value}"
+      form = form.join('&')
+
     fetch(uri.toString(),
-      headers: 'Content-Type': 'application/json'
+      headers: headers
       method: method
+      body: form
     )
       .then(checkStatus)
       .then((response) -> response.json())

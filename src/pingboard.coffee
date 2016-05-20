@@ -2,8 +2,8 @@
 #   A hubot script for interacting with Pingboard.com
 #
 # Configuration:
-#   HUBOT_PINGBOARD_USERNAME
-#   HUBOT_PINGBOARD_PASSWORD
+#   HUBOT_PINGBOARD_CLIENT_ID
+#   HUBOT_PINGBOARD_CLIENT_SECRET
 #   HUBOT_PINGBOARD_SUBDOMAIN
 #   HUBOT_PINGBOARD_FLOWDOCK_FLOW_TOKEN
 #   HUBOT_PINGBOARD_IGNORED_GROUPS - Comma list of group names to ignore.
@@ -27,10 +27,13 @@ require 'string_score'
 PingboardApi = require '../lib/pingboard-api'
 
 MULTI_DAY_FORMAT = 'ddd M/D'
-USERNAME = process.env.HUBOT_PINGBOARD_USERNAME
-PASSWORD = process.env.HUBOT_PINGBOARD_PASSWORD
+CLIENT_ID = process.env.HUBOT_PINGBOARD_CLIENT_ID
+CLIENT_SECRET = process.env.HUBOT_PINGBOARD_CLIENT_SECRET
 SUBDOMAIN = process.env.HUBOT_PINGBOARD_SUBDOMAIN
 IGNORED_GROUPS = process.env.HUBOT_PINGBOARD_IGNORED_GROUPS?.split(',')
+
+PINGBOARD_API =
+  new PingboardApi(clientId: CLIENT_ID, clientSecret: CLIENT_SECRET)
 
 # TODO Replace with an automated way to gather this info. Perhaps Flowdock's
 # API or better, a custom field in Pingboard for chat username.
@@ -147,8 +150,7 @@ module.exports = (robot) ->
     finalMessages.join('\n')
 
   robot.router.post '/hubot/pingboard-update', (req, res) ->
-    pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
-    pingboardApi.fetchStatuses().then((data) ->
+    PINGBOARD_API.fetchStatuses().then((data) ->
       allStatuses = normalizeStatuses(data)
       message = formatStatusMessage(allStatuses)
 
@@ -202,8 +204,7 @@ module.exports = (robot) ->
     )
 
   robot.respond /who.?s out(?:\?)?/, (msg) ->
-    pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
-    pingboardApi.fetchStatuses().then((data) ->
+    PINGBOARD_API.fetchStatuses().then((data) ->
       allStatuses = normalizeStatuses(data)
       message = formatStatusMessage(allStatuses)
       msg.send(message)
@@ -213,14 +214,12 @@ module.exports = (robot) ->
     )
 
   robot.hear(USERNAMES_REGEX, (msg) ->
-    pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
-
     return unless msg.match.length > 0
 
     msg.match.forEach (username) ->
       user = _.find USERNAMES_TO_PINGBOARD, username: username.replace('@','')
 
-      pingboardApi.fetchStatusesForUserId(user.pingboardUserId).then((data) ->
+      PINGBOARD_API.fetchStatusesForUserId(user.pingboardUserId).then((data) ->
         allStatuses = normalizeStatuses(data)
         unavailableStatuses = _.filter(
           allStatuses, 'statusType.available', false
@@ -261,8 +260,7 @@ module.exports = (robot) ->
   ) if USERNAMES_REGEX # Don't apply this with an empty regex
 
   robot.respond /(list projects|what projects do we have(?:\?)?)/, (msg) ->
-    pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
-    pingboardApi.fetchGroups().then((data) ->
+    PINGBOARD_API.fetchGroups().then((data) ->
       groups = normalizeGroups(data)
       groupNames = groups.map((group) -> group.name)
       sortedGroups = _.sortBy(groups, 'name')
@@ -279,8 +277,7 @@ module.exports = (robot) ->
   robot.respond /who(?:.s| is) on (.+?)(?:\?)?/, (msg) ->
     projectName = msg.match[1]
 
-    pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
-    pingboardApi.fetchGroups().then((data) ->
+    PINGBOARD_API.fetchGroups().then((data) ->
       groups = normalizeGroups(data)
       matchingGroup = _.max(groups, (group) ->
         group.name.score(projectName)
@@ -295,8 +292,7 @@ module.exports = (robot) ->
   robot.respond /what(?:.s| is) (.+) working on(?:\?)?/, (msg) ->
     userName = msg.match[1]
 
-    pingboardApi = new PingboardApi(username: USERNAME, password: PASSWORD)
-    pingboardApi.fetchUsers().then((data) ->
+    PINGBOARD_API.fetchUsers().then((data) ->
       users = normalizeUsers(data)
       matchingUser = _.max(users, (user) -> user.name.score(userName))
       groupsText = _.chain(matchingUser.groups)

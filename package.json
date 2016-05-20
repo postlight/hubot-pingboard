@@ -1,7 +1,7 @@
 {
   "name": "hubot-pingboard",
   "description": "A hubot script for interacting with Pingboard.com",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Jeremy Mack <jeremy.mack@postlight.com>",
   "license": "MIT",
   "keywords": "hubot, hubot-scripts",
